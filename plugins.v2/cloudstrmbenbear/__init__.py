@@ -56,7 +56,7 @@ class CloudStrmBenbear(_PluginBase):
     # 插件图标
     plugin_icon = "https://raw.githubusercontent.com/benbeartop/MoviePilot-Plugins/main/icons/cloudcompanion.png"
     # 插件版本
-    plugin_version = "1.3.4"
+    plugin_version = "1.4"
     # 插件作者
     plugin_author = "benbear"
     # 作者主页
@@ -392,7 +392,16 @@ class CloudStrmBenbear(_PluginBase):
         # 构建完整URL
         auth_key = f"{timestamp}-{rand}-{self._pan123_uid}-{md5hash}"
         
-        return f"{uri}?auth_key={auth_key}"
+        # 使用自定义域名构建URL
+        if hasattr(self, '_pan123_domain') and self._pan123_domain:
+            base_url = f"{self._pan123_domain}"
+            if self._pan123_show_uid:
+                return f"{base_url}/{self._pan123_uid}{cloud_file}?auth_key={auth_key}"
+            else:
+                return f"{base_url}{cloud_file}?auth_key={auth_key}"
+        else:
+            # 向下兼容旧版本
+            return f"{uri}?auth_key={auth_key}"
 
     def __create_strm_file(self, strm_file: str, strm_content: str):
 
@@ -1060,11 +1069,10 @@ class CloudStrmBenbear(_PluginBase):
                                         'component': 'VSwitch',
                                         'props': {
                                             'model': '_run_once',
-                                            'label': '立即运行一次',
-                                            'readonly': True
+                                            'label': '立即运行一次'
                                         },
-                                        'events': {
-                                            'click': 'run_once'
+                                        'on': {
+                                            'change': 'run_once'
                                         }
                                     }
                                 ]
@@ -1413,7 +1421,8 @@ class CloudStrmBenbear(_PluginBase):
             "pan123_uid": "",
             "pan123_private_key": "",
             "pan123_show_uid": True,  # 新增：是否在URL中显示UID，默认显示
-            "pan123_expire_minutes": 525600
+            "pan123_expire_minutes": 525600,
+            "_run_once": False  # 新增：立即运行一次开关的默认值
         }
 
     def get_page(self) -> List[dict]:
@@ -1440,26 +1449,36 @@ class CloudStrmBenbear(_PluginBase):
             self._scheduler = None
 
     @eventmanager.register(EventType.PluginAction)
-    def run_once(self, event: Event = None):
+    def run_once(self, *args, **kwargs):
         """
-        立即运行一次（全量更新）
+        手动触发一次全量更新
         """
         if not self._enabled:
+            logger.info(f"云盘Strm助手未启用，无法执行！")
+            self.post_message(channel=self._event_channel, event="notify",
+                              title="云盘Strm助手", text=f"云盘Strm助手未启用，无法执行！")
             return
-            
+
+        logger.info(f"云盘Strm助手开始全量运行...")
         # 遍历所有监控目录
-        for mon_path in self._strm_dir_conf.keys():
-            logger.info(f"开始全量更新目录：{mon_path}")
-            # 遍历目录下的所有文件
-            for root, dirs, files in os.walk(mon_path):
+        for conf in self._strm_dir_conf:
+            # 遍历目录下所有文件
+            source_path = os.path.normpath(conf.get('source_path'))
+            if not os.path.exists(source_path):
+                logger.warn(f"监控目录不存在：{source_path}")
+                continue
+            logger.info(f"开始处理目录：{source_path}")
+            for root, dirs, files in os.walk(source_path):
                 for file in files:
                     file_path = os.path.join(root, file)
-                    self.__handle_file(event_path=file_path, mon_path=mon_path)
-            
-        logger.info("全量更新完成")
-        if event:
-            self.post_message(
-                channel=event.event_data.get("channel"),
-                title="全量更新完成",
-                userid=event.event_data.get("user")
-            )
+                    self.__handle_file(file_path, conf)
+        
+        # 执行完成后将开关复位
+        self._run_once = False
+        self.update_config({
+            "_run_once": False
+        })
+        
+        logger.info(f"云盘Strm助手全量运行完成")
+        self.post_message(channel=self._event_channel, event="notify",
+                        title="云盘Strm助手", text=f"云盘Strm助手全量运行完成")

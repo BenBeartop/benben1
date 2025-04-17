@@ -56,7 +56,7 @@ class CloudStrmBenbear(_PluginBase):
     # 插件图标
     plugin_icon = "https://raw.githubusercontent.com/benbeartop/MoviePilot-Plugins/main/icons/cloudcompanion.png"
     # 插件版本
-    plugin_version = "1.3.2"
+    plugin_version = "1.3.4"
     # 插件作者
     plugin_author = "benbear"
     # 作者主页
@@ -1057,12 +1057,13 @@ class CloudStrmBenbear(_PluginBase):
                                 },
                                 'content': [
                                     {
-                                        'component': 'VBtn',
+                                        'component': 'VSwitch',
                                         'props': {
-                                            'color': 'primary',
-                                            'text': '立即运行一次'
+                                            'model': '_run_once',
+                                            'label': '立即运行一次',
+                                            'readonly': True
                                         },
-                                        'on': {
+                                        'events': {
                                             'click': 'run_once'
                                         }
                                     }

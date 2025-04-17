@@ -1062,6 +1062,7 @@ class CloudStrmBenbear(_PluginBase):
                                             'variant': 'tonal',
                                             'text': '立即运行一次',
                                             'click': 'run_once',
+                                            'action': 'run_once'
                                         }
                                     }
                                 ]

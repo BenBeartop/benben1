@@ -3,11 +3,12 @@
     "name": "云盘Strm助手（123版）",
     "description": "实时监控、全量增量生成strm文件。",
     "labels": "云盘",
-    "version": "1.3.1",
+    "version": "1.3.2",
     "icon": "https://raw.githubusercontent.com/benbeartop/MoviePilot-Plugins/main/icons/cloudcompanion.png",
     "author": "benbear",
     "level": 1,
     "history": {
+      "v1.3.2": "修复",
       "v1.3.1": "增加全量更新",
       "v1.3": "增加123云盘直链"
     }

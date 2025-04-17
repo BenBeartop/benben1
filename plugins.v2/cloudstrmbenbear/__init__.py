@@ -50,13 +50,13 @@ class FileMonitorHandler(FileSystemEventHandler):
 
 class CloudStrmBenbear(_PluginBase):
     # 插件名称
-    plugin_name = "云盘Strm助手"
+    plugin_name = "云盘Strm助手（123版）"
     # 插件描述
     plugin_desc = "实时监控、定时全量增量生成strm文件。"
     # 插件图标
     plugin_icon = "https://raw.githubusercontent.com/benbeartop/MoviePilot-Plugins/main/icons/cloudcompanion.png"
     # 插件版本
-    plugin_version = "1.3.1"
+    plugin_version = "1.3.2"
     # 插件作者
     plugin_author = "benbear"
     # 作者主页
@@ -1057,12 +1057,13 @@ class CloudStrmBenbear(_PluginBase):
                                 },
                                 'content': [
                                     {
-                                        'component': 'VButton',
+                                        'component': 'VBtn',
                                         'props': {
-                                            'variant': 'tonal',
-                                            'text': '立即运行一次',
-                                            'click': 'run_once',
-                                            'action': 'run_once'
+                                            'color': 'primary',
+                                            'text': '立即运行一次'
+                                        },
+                                        'on': {
+                                            'click': 'run_once'
                                         }
                                     }
                                 ]

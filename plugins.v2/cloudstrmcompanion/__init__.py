@@ -48,9 +48,9 @@ class FileMonitorHandler(FileSystemEventHandler):
                                 mon_path=self._watch_path, event_path=event.dest_path)
 
 
-class CloudStrmBenbear(_PluginBase):
+class CloudStrmCompanion(_PluginBase):
     # 插件名称
-    plugin_name = "云盘Strm助手同步"
+    plugin_name = "云盘Strm助手"
     # 插件描述
     plugin_desc = "实时监控、定时全量增量生成strm文件。"
     # 插件图标
@@ -58,11 +58,11 @@ class CloudStrmBenbear(_PluginBase):
     # 插件版本
     plugin_version = "1.3.1"
     # 插件作者
-    plugin_author = "benbear"
+    plugin_author = "thsrite"
     # 作者主页
-    author_url = "https://github.com/benbeartop"
+    author_url = "https://github.com/thsrite"
     # 插件配置项ID前缀
-    plugin_config_prefix = "cloudstrmBenbear_"
+    plugin_config_prefix = "cloudstrmCompanion_"
     # 加载顺序
     plugin_order = 26
     # 可使用的用户级别
@@ -849,7 +849,7 @@ class CloudStrmBenbear(_PluginBase):
                 "desc": "云盘Strm助手同步",
                 "category": "",
                 "data": {
-                    "action": "CloudStrmBenbear"
+                    "action": "CloudStrmCompanion"
                 }
             },
             {
@@ -1049,6 +1049,23 @@ class CloudStrmBenbear(_PluginBase):
                                     }
                                 ]
                             },
+                            {
+                                'component': 'VCol',
+                                'props': {
+                                    'cols': 12,
+                                    'md': 4
+                                },
+                                'content': [
+                                    {
+                                        'component': 'VButton',
+                                        'props': {
+                                            'variant': 'tonal',
+                                            'text': '立即运行一次',
+                                            'click': 'run_once',
+                                        }
+                                    }
+                                ]
+                            }
                         ]
                     },
                     {
@@ -1418,3 +1435,28 @@ class CloudStrmBenbear(_PluginBase):
                 self._scheduler.shutdown()
                 self._event.clear()
             self._scheduler = None
+
+    @eventmanager.register(EventType.PluginAction)
+    def run_once(self, event: Event = None):
+        """
+        立即运行一次（全量更新）
+        """
+        if not self._enabled:
+            return
+            
+        # 遍历所有监控目录
+        for mon_path in self._strm_dir_conf.keys():
+            logger.info(f"开始全量更新目录：{mon_path}")
+            # 遍历目录下的所有文件
+            for root, dirs, files in os.walk(mon_path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    self.__handle_file(event_path=file_path, mon_path=mon_path)
+            
+        logger.info("全量更新完成")
+        if event:
+            self.post_message(
+                channel=event.event_data.get("channel"),
+                title="全量更新完成",
+                userid=event.event_data.get("user")
+            )

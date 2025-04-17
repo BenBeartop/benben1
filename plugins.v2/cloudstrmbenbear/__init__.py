@@ -48,23 +48,23 @@ class FileMonitorHandler(FileSystemEventHandler):
                                 mon_path=self._watch_path, event_path=event.dest_path)
 
 
-class CloudStrmCompanion(_PluginBase):
+class CloudStrmBenbear(_PluginBase):
     # 插件名称
     plugin_name = "云盘Strm助手"
     # 插件描述
     plugin_desc = "实时监控、定时全量增量生成strm文件。"
     # 插件图标
-    plugin_icon = "https://raw.githubusercontent.com/thsrite/MoviePilot-Plugins/main/icons/cloudcompanion.png"
+    plugin_icon = "https://raw.githubusercontent.com/benbeartop/MoviePilot-Plugins/main/icons/cloudcompanion.png"
     # 插件版本
     plugin_version = "1.3.1"
     # 插件作者
-    plugin_author = "thsrite"
+    plugin_author = "benbear"
     # 作者主页
-    author_url = "https://github.com/thsrite"
+    author_url = "https://github.com/benbeartop"
     # 插件配置项ID前缀
-    plugin_config_prefix = "cloudstrmCompanion_"
+    plugin_config_prefix = "cloudstrmBenbear_"
     # 加载顺序
-    plugin_order = 26
+    plugin_order = 1
     # 可使用的用户级别
     auth_level = 1
 
@@ -849,7 +849,7 @@ class CloudStrmCompanion(_PluginBase):
                 "desc": "云盘Strm助手同步",
                 "category": "",
                 "data": {
-                    "action": "CloudStrmCompanion"
+                    "action": "CloudStrmBenbear"
                 }
             },
             {
